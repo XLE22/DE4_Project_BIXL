@@ -1,0 +1,48 @@
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - "2025:5000"
+    networks:
+      - containers-net
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+  data:
+    image: app/data:1.0.0
+    container_name: data
+    build:
+      context: .
+    ports:
+      - "5001:5000"
+    restart: unless-stopped
+    networks:
+      - containers-net
+    volumes:
+      - data-vol:/app/data/datatourisme_poi
+    command: uvicorn app.data.main:app --host 0.0.0.0 --port 5000 --reload
+  # logs:
+  #   image: app/logs:1.0.0
+  #   container_name: logs
+  #   build:
+  #     context: .
+  #   ports:
+  #     - "5002:5000"
+  #   restart: unless-stopped
+  #   networks:
+  #     - containers-net
+  #   volumes:
+  #     - logs-vol:/app/logs/logs
+  #   command: uvicorn app.logs.main:app --host 0.0.0.0 --port 5000 --reload
+networks:
+  containers-net:
+volumes:
+  data-vol:
+    driver: local
+  # logs-vol:
+  #   driver: local

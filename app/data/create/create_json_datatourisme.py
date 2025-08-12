@@ -1,0 +1,183 @@
+import logging
+import os
+import datetime
+import shutil
+import json
+import pandas as pd
+from dotenv import load_dotenv
+from fastapi import APIRouter
+from app.logs.logs import *
+
+logger=logging.getLogger("create_logger")
+router = APIRouter(prefix="/data_create")
+
+CONTACT = 'hasContact'
+INFOS_JSON = 'file'
+LOCATION = 'isLocatedAt'
+LOCATION_ADDRESS = 'schema:address'
+LOCATION_GEO = 'schema:geo'
+NOM = 'label'
+RIEN = "Info vide"
+
+POI_NOM = "nom"
+POI_THEMES = "themes"
+POI_ADRESSE = "adresse"
+POI_DESCRIPTION = "description"
+POI_ETOILES = "etoiles"
+POI_CONTACT = "contact"
+POI_GEOLOC = "geoloc"
+
+def poi_get_name(db: pd.DataFrame, elt: int) -> str | bool:
+    try:
+        return db.loc[[elt],[NOM]].values[0][0]
+    except:
+        logger.error()
+        return False
+    
+def poi_get_themes(j_content: str) -> list[str]:
+    themes: list[str]=[]
+
+    if 'hasTheme' not in j_content:
+        themes.append(RIEN)
+        return themes
+    
+    for nb_theme in range(len(j_content['hasTheme'])):
+        if ('rdfs:label' in j_content['hasTheme'][nb_theme].keys()) and \
+            ('fr' in j_content['hasTheme'][nb_theme]['rdfs:label'].keys()):
+            themes.append(j_content['hasTheme'][nb_theme]['rdfs:label']['fr'][0])
+                
+    return themes
+
+def poi_get_location(j_content: str) -> list[str]:
+    location_info: list[str]=[]
+
+    if (LOCATION not in j_content) or (LOCATION_ADDRESS not in j_content[LOCATION][0].keys()):
+        location_info.append(RIEN)
+        return location_info
+    
+    if 'schema:streetAddress' in j_content[LOCATION][0][LOCATION_ADDRESS][0].keys():
+        location_info.append(j_content[LOCATION][0][LOCATION_ADDRESS][0]['schema:streetAddress'])
+    
+    if 'schema:addressLocality' in j_content[LOCATION][0][LOCATION_ADDRESS][0].keys():
+        location_info.append(j_content[LOCATION][0][LOCATION_ADDRESS][0]['schema:addressLocality'])
+    
+    if 'schema:postalCode' in j_content[LOCATION][0][LOCATION_ADDRESS][0].keys():
+        location_info.append(j_content[LOCATION][0][LOCATION_ADDRESS][0]['schema:postalCode'])
+
+    return location_info
+
+def poi_get_description(j_content: str) -> str:
+
+    if 'hasDescription' not in j_content: return ""
+
+    if 'dc:description' in j_content['hasDescription'][0].keys() and\
+        ('fr') in j_content['hasDescription'][0]['dc:description'].keys():
+        return j_content['hasDescription'][0]['dc:description']['fr'][0]
+    
+    return ""
+    
+def poi_get_stars(j_content: str) -> float:
+
+    if 'hasReview' not in j_content: return 0
+
+    if 'hasReviewValue' in j_content['hasReview'][0].keys() and\
+        'schema:ratingValue' in j_content['hasReview'][0]['hasReviewValue'].keys():
+        return j_content['hasReview'][0]['hasReviewValue']['schema:ratingValue']
+    
+    return 0
+
+def poi_get_contact_info(j_content: str) -> list[str]:
+    contact_info: list[str]=[]
+
+    if CONTACT not in j_content:
+        contact_info.append(RIEN)
+        return contact_info
+    
+    if 'schema:telephone' in j_content[CONTACT][0].keys():
+        contact_info.append(j_content[CONTACT][0]['schema:telephone'][0])
+
+    if 'foaf:homepage' in j_content[CONTACT][0].keys():
+        contact_info.append(j_content[CONTACT][0]['foaf:homepage'][0])
+
+    return contact_info
+
+def poi_get_location_info(j_content: str) -> list[str] | bool:
+    location_info: list[str]=[]
+    
+    if (LOCATION not in j_content) or (LOCATION_GEO not in j_content[LOCATION][0].keys()):
+        location_info.append(RIEN)
+        return location_info
+    
+    if (('schema:latitude') and ('schema:longitude')) in j_content[LOCATION][0][LOCATION_GEO].keys():
+        location_info.append(j_content[LOCATION][0][LOCATION_GEO]['schema:latitude'])
+        location_info.append(j_content[LOCATION][0][LOCATION_GEO]['schema:longitude'])
+        return location_info
+    
+    return False
+    
+def poi_get_infos() -> bool:
+    FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+    PARENT_FILE_PATH = os.path.dirname((FILE_PATH))
+    POI_PATH = PARENT_FILE_PATH + '/datatourisme_poi'
+    INDEX_PATH = POI_PATH + '/index.json'
+    
+    if os.path.exists(INDEX_PATH) is False:
+        logger.error("Le fichier index.json n'existe pas", exc_info=True)
+        return False
+
+    try:
+        db = pd.read_json(INDEX_PATH)
+        nb_elts = db[NOM].count()
+        poi_data = {}
+        poi_data_all = []
+
+        for elt in range(0,nb_elts):
+            poi_data[POI_NOM] = poi_get_name(db,elt)
+            file_name: str = db.loc[[elt],[INFOS_JSON]].values[0][0]
+
+            with open(POI_PATH + '/objects/' + file_name, encoding = 'UTF-8') as json_file:
+                json_content = json.load(json_file)
+                poi_data[POI_GEOLOC] = poi_get_location_info(json_content)
+                poi_data[POI_THEMES] = poi_get_themes(json_content)
+                poi_data[POI_ADRESSE] = poi_get_location(json_content)
+                poi_data[POI_ETOILES] = poi_get_stars(json_content)
+                poi_data[POI_DESCRIPTION] = poi_get_description(json_content)
+                poi_data[POI_CONTACT] = poi_get_contact_info(json_content)
+
+            poi_data_all.append(poi_data)
+            poi_data = {}
+
+        nao: datetime = datetime.datetime.now()
+        file_name = f"{nao:%y%m%d}_data_poi_{nao:%H%M}.json"
+
+        try:
+            with open(PARENT_FILE_PATH + '/' + file_name, "w", encoding = 'UTF-8') as file_tmp:
+                json.dump(poi_data_all, file_tmp, indent=1, ensure_ascii=False)
+
+            shutil.rmtree(POI_PATH, ignore_errors=True) #Suppression des sources pour limiter la taille.
+            shutil.move(PARENT_FILE_PATH + '/' + file_name,POI_PATH) #Déplacement du '.json' dans le répertoire approprié.
+            return True
+        except:
+            logger.error()
+            return False
+    
+    except:
+        logger.error()
+        return False
+    
+@router.get("/")
+def main_create() -> bool:
+    load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
+    get_log_from(LogLevels.debug)
+
+    logger.info("Début de la création du fichier JSON")
+
+    if poi_get_infos():
+        logger.info("Création du JSON datatourisme OK")
+        return True
+    
+    logger.error("⚠️ Création du JSON datatourisme NOK ⚠️")
+    return False
+
+if __name__ == "__main__":
+    main_create()
