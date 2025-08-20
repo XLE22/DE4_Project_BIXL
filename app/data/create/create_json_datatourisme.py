@@ -7,6 +7,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from fastapi import APIRouter
 from app.logs.logs import *
+from .poi_ontology_converter import POC
 
 logger=logging.getLogger("create_logger")
 router = APIRouter(prefix="/data_create")
@@ -37,15 +38,29 @@ def poi_get_name(db: pd.DataFrame, elt: int) -> str | bool:
 def poi_get_themes(j_content: str) -> list[str]:
     themes: list[str]=[]
 
-    if 'hasTheme' not in j_content:
+    if '@type' not in j_content:
         themes.append(RIEN)
         return themes
     
-    for nb_theme in range(len(j_content['hasTheme'])):
-        if ('rdfs:label' in j_content['hasTheme'][nb_theme].keys()) and \
-            ('fr' in j_content['hasTheme'][nb_theme]['rdfs:label'].keys()):
-            themes.append(j_content['hasTheme'][nb_theme]['rdfs:label']['fr'][0])
-                
+    if len(j_content['@type']) > 0:
+        for theme in j_content['@type']:
+            if theme.startswith("schema:"):
+                if theme[7:] not in themes: themes.append(theme[7:])
+            else:
+                if not theme.startswith("schema:") and \
+                (theme != "PlaceOfInterest") and \
+                    (theme != "PointOfInterest") and \
+                        (theme not in themes):
+                    themes.append(theme)
+    
+    if len(themes) > 0:
+        final_themes: list[str]=[]
+        for elt in themes:
+            if elt in POC:
+                if POC[elt] not in final_themes: final_themes.append(POC[elt])
+        return final_themes
+
+    themes.append(RIEN)
     return themes
 
 def poi_get_location(j_content: str) -> list[str]:
