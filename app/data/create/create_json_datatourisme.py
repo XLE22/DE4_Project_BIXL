@@ -27,6 +27,26 @@ POI_DESCRIPTION = "description"
 POI_ETOILES = "etoiles"
 POI_CONTACT = "contact"
 POI_GEOLOC = "geoloc"
+POI_GEOLOC_LAT = "lat"
+POI_GEOLOC_LONG = "long"
+
+def remove_duplicates(file_name: str) -> bool:
+    try:
+        df = pd.read_json(file_name)
+        df[[POI_GEOLOC_LAT,POI_GEOLOC_LONG]] = pd.DataFrame(df[POI_GEOLOC].to_list(),
+                                                            columns=[POI_GEOLOC_LAT,POI_GEOLOC_LONG])
+        df.drop_duplicates(subset=[POI_NOM,
+                                   POI_GEOLOC_LAT,
+                                   POI_GEOLOC_LONG],
+                            inplace=True)
+        df.to_json(file_name,
+                   orient='records',
+                   indent=1,
+                   force_ascii=False)
+        return True
+    except:
+        logger.error()
+        return False
 
 def poi_get_name(db: pd.DataFrame, elt: int) -> str | bool:
     try:
@@ -164,14 +184,20 @@ def poi_get_infos() -> bool:
 
         nao: datetime = datetime.datetime.now()
         file_name = f"{nao:%y%m%d}_data_poi_{nao:%H%M}.json"
+        file_path = PARENT_FILE_PATH + '/' + file_name
 
         try:
-            with open(PARENT_FILE_PATH + '/' + file_name, "w", encoding = 'UTF-8') as file_tmp:
-                json.dump(poi_data_all, file_tmp, indent=1, ensure_ascii=False)
+            with open(file_path, "w", encoding = 'UTF-8') as file_tmp:
+                json.dump(poi_data_all,
+                          file_tmp,
+                          indent=1,
+                          ensure_ascii=False)
 
-            shutil.rmtree(POI_PATH, ignore_errors=True) #Suppression des sources pour limiter la taille.
-            shutil.move(PARENT_FILE_PATH + '/' + file_name,POI_PATH) #Déplacement du '.json' dans le répertoire approprié.
-            return True
+            if remove_duplicates(file_path):
+                shutil.rmtree(POI_PATH, ignore_errors=True) #Suppression des sources pour limiter la taille.
+                shutil.move(file_path,POI_PATH) #Déplacement du '.json' dans le répertoire approprié.
+                return True
+            return False
         except:
             logger.error()
             return False
