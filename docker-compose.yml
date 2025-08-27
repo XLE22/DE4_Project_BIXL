@@ -26,9 +26,9 @@ services:
     volumes:
       - data-vol:/app/data/datatourisme_poi
     command: uvicorn app.data.main:app --host 0.0.0.0 --port 5000 --reload
-  # logs:
-  #   image: app/logs:1.0.0
-  #   container_name: logs
+  # database:
+  #   image: app/database:1.0.0
+  #   container_name: database
   #   build:
   #     context: .
   #   ports:
@@ -36,13 +36,20 @@ services:
   #   restart: unless-stopped
   #   networks:
   #     - containers-net
-  #   volumes:
-  #     - logs-vol:/app/logs/logs
-  #   command: uvicorn app.logs.main:app --host 0.0.0.0 --port 5000 --reload
+  #   command: uvicorn app.data.main:app --host 0.0.0.0 --port 5000 --reload
+  map:
+    image: app/map:1.0.0
+    container_name: map
+    build:
+      context: .
+    ports:
+      - "5003:5000"
+    restart: unless-stopped
+    networks:
+      - containers-net
+    command: uvicorn app.map.main:app --host 0.0.0.0 --port 5000 --reload
 networks:
   containers-net:
 volumes:
   data-vol:
     driver: local
-  # logs-vol:
-  #   driver: local
