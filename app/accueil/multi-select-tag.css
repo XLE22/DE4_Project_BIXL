@@ -1,0 +1,83 @@
+/*
+MIT License
+Copyright (c) 2022 Habibullah Mohammadi
+https://github.com/habibmhamadi/multi-select-tag
+*/
+.multi-select-tag {
+    /* all: revert !important; */
+    /* font-family: inherit !important; */
+    font-family:'Helvetica Light';
+    font-size: 15px
+}
+.multi-select-tag .wrapper {
+    position: relative;
+}
+.multi-select-tag .tag-container {
+    display: flex;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: 1px solid #000000;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    background-color: #000000;
+}
+.multi-select-tag .tag-input {
+    padding: 0.25rem;
+    flex-grow: 1;
+    outline: 1px solid #ffffff;
+    outline-offset: 0px;
+    border: none;
+    background-color: #000000;
+    margin: 0;
+    line-height: 1.25rem;
+}
+.multi-select-tag .tag-input::placeholder {
+    color:#ffffff;
+    font-size: 18px;
+    font-family: 'Helvetica';
+}
+.multi-select-tag .dropdown {
+    overflow: auto;
+    position: absolute;
+    z-index: 10;
+    padding: 0px;
+    margin-top: 0.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #000000;
+    width: 100%;
+    max-height: 15rem;
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    color: #000000;
+}
+.multi-select-tag .li {
+    padding: 0.5rem;
+    cursor: pointer;
+    list-style-type: none;
+}
+.multi-select-tag .li:hover {
+    background-color: rgb(255, 111, 0);
+}
+.multi-select-tag .li-arrow {
+   background-color: rgb(255, 111, 0);
+}
+.multi-select-tag .tag-item {
+    display: flex;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    align-items: center;
+    border-radius: 0.25rem;
+    color: #000000;
+    background-color: #ffffff;
+}
+.multi-select-tag .cross {
+    margin-left: 0.25rem;
+    cursor: pointer;
+}
+.multi-select-tag .hidden {
+    display: none;
+}

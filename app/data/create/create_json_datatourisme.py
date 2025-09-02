@@ -6,7 +6,7 @@ import json
 import pandas as pd
 from dotenv import load_dotenv
 from fastapi import APIRouter
-from app.logs.logs import *
+# from app.logs.logs import *
 from .poi_ontology_converter import POC
 
 logger=logging.getLogger("create_logger")
@@ -209,7 +209,7 @@ def poi_get_infos() -> bool:
 @router.get("/")
 def main_create() -> bool:
     load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
-    get_log_from(LogLevels.debug)
+    # get_log_from(LogLevels.debug)
 
     logger.info("Début de la création du fichier JSON")
 

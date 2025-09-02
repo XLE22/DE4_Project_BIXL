@@ -6,7 +6,7 @@ import zipfile
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter
-from app.logs.logs import *
+# from app.logs.logs import *
 
 logger=logging.getLogger("extract_logger")
 app = FastAPI()
@@ -50,7 +50,7 @@ def unfold_data(data: zipfile.ZipFile) -> bool:
 @router.get("/")
 def main_extract() -> bool:
     load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
-    get_log_from(LogLevels.debug)
+    # get_log_from(LogLevels.debug)
 
     logger.info("Début de l'extraction")
     

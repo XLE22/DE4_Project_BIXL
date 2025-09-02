@@ -1,0 +1,27 @@
+body{
+    padding:0;
+
+    .row {
+        display: flex;
+    }
+
+    .column {
+        flex: 50%;
+    }
+
+    .button {
+        background-color: rgb(0, 0, 0);
+        color: white;
+        padding: 10px 20px;
+        border: black;
+        border-style: solid;
+        border-width: thin;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: rgb(255, 111, 0);
+        color: rgb(0, 0, 0);
+    }
+}

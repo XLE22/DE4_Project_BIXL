@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Project BIXL">
+    <meta name="authors" content="Brahim ICHQARRANE & Xavier LELEU">
+    <link href="src/accueil.css" rel="stylesheet">
+    <link href="src/multi-select-tag.css" rel="stylesheet">
+  </head>
+  <body>
+    <div style="text-align:center; background-color:rgb(255, 255, 255);height:11vh;">
+        <img src="images/img_titre.png"
+             id="titre"
+             alt="titre"
+             style="max-height: 100%; object-fit: cover;"
+             onclick="img_title_click()">
+    </div> <!-- En-tête : image -->
+    <div style="padding:0px;padding-bottom: 10px; height: 15vh;">
+        <!-- background-color:black; -->
+        <div class="row" style="height: 40px;text-align: center;padding-bottom: 5px;">
+            <div class="column">
+                <div class="row" style="height: 40px;color:rgb(0, 0, 0);padding:2px;align-items: center;">
+                    <!-- background-color:rgb(127, 227, 240); -->
+                    <div class="column" style="flex: 10%;text-align: right;padding: 2px;">
+                        <p style="font-family:'Helvetica Bold';font-size: 20px;margin-right: 5px;">De :</p>
+                    </div>
+                    <div class="column" style="flex: 90%;text-align: left;">
+                        <!--  https://www.w3schools.com/html/html5_webstorage.asp  -->
+                        <input type="text"
+                               id="departure" 
+                               style="font-family:'Helvetica Light';font-size: 20px;width: 90%;border: 1;" 
+                               placeholder=" Adresse de départ"
+                               onchange="address(this.id)">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="row" style="height: 40px;color:rgb(0, 0, 0);padding:2px;align-items: center;">
+                    <!-- background-color:rgb(227, 127, 240); -->
+                    <div class="column" style="flex: 10%;text-align: right;padding: 2px;">
+                        <p style="font-family:'Helvetica Bold';font-size: 20px;margin: 0px; margin-right: 5px;">Vers :</p>
+                    </div>
+                    <div class="column" style="flex: 90%;text-align: left;">
+                        <input type="text" 
+                               id="arrival" 
+                               style="font-family:'Helvetica Light';font-size: 20px;width: 90%;border: 1;" 
+                               placeholder=" Adresse d'arrivée"
+                               onchange="address(this.id)">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <div style="color:white;padding:2px;width:57vw">
+                    <!-- background-color:rgb(129, 203, 18); -->
+                    <select name="tab_themes[]" id="themes" multiple>
+                        <option value="com" selected>Commerce</option>
+                        <option value="cult" selected>Culture</option>
+                        <option value="eve" selected>Événement</option>
+                        <option value="heb" selected>Hébergement</option>
+                        <option value="loi" selected>Loisirs</option>
+                        <option value="pat" selected>Patrimoine</option>
+                        <option value="res" selected>Restauration</option>
+                        <option value="ser" selected>Service</option>
+                        <option value="sitnat" selected>Site naturel</option>
+                    </select>
+                    <!-- <select name="tab_themes[]" id="themes" multiple>
+                        <option value="com" selected>Commerce</option>
+                        <option value="cult" selected>Culture</option>
+                        <option value="eve" selected>Événement</option>
+                        <option value="heb" selected>Hébergement</option>
+                        <option value="loi" selected>Loisirs</option>
+                        <option value="pat" selected>Patrimoine</option>
+                        <option value="res" selected>Restauration</option>
+                        <option value="ser" selected>Service</option>
+                        <option value="sitnat" selected>Site naturel</option>
+                    </select> -->
+                </div>
+            </div>
+            <div class="column" style="color:rgb(0, 0, 0);padding:2px;height: 46px;align-content: center;">
+                <!-- background-color:rgb(223, 244, 128); -->
+                <span style="font-family:'Helvetica Bold';font-size: 20px;padding-left: 50px;padding-right: 5px;display: inline-block; vertical-align: middle;">
+                    Rayon de recherche : 
+                </span>
+                <span class="slider_rayon_valeur"
+                      id="slider_rayon_valeur"
+                      style="font-family:'Helvetica';font-size: 20px;display: inline-block; vertical-align: middle;">
+                    5
+                </span>
+                <span style="font-family:'Helvetica';font-size: 20px;display: inline-block; vertical-align: middle;">
+                     km 
+                </span>
+                <input type="range"
+                       id="slider_rayon" 
+                       min="1" 
+                       max="9" 
+                       step="1" 
+                       value="5" 
+                       style="width: 43%;margin-left: 30px; vertical-align: middle;">
+                       <!-- onchange="slider_change()"> -->
+            </div>
+        </div>
+        <div class="row" style="height: 50px; margin-top: -4px; ">
+            <div class="column" style="flex: 20%;">
+                <!-- background-color:rgb(227, 127, 240); -->
+                <div style="color:white;padding: 10px;display: flex;align-items: center;justify-content: center;">
+                    <button class="button"
+                            id="btn_suggestion" 
+                            style="font-family:'Helvetica';font-size: 20px;"
+                            onclick="btn_propose_click()">
+                        Proposition
+                    </button>
+                </div>
+            </div>
+            <div class="column" style="flex: 20%;">
+                <!-- background-color:rgb(127, 227, 240); -->
+                <div style="color:white;padding:10px;display: flex;align-items: center;justify-content: center;">
+                    <button class="button"
+                            id="btn_validation"
+                            style="font-family:'Helvetica';font-size: 20px;"
+                            onclick="btn_validate_click()">
+                        Validation
+                    </button>
+                </div>
+            </div>
+            <div class="column" style="flex: 60%;">
+                <!-- background-color:rgb(255, 247, 0); -->
+                <div style="color:rgb(0, 0, 0);padding:1px;display: flex;align-items: center;justify-content: center;">
+                    <p id="travel_time_estimation"
+                       style="font-family:'Helvetica';font-size: 20px;"
+                       onclick="estimate_travel_time_click()"></p>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Éléments graphiques -->
+    <div style="padding:0px; margin-top: 2px; height: 71vh;">
+        <!-- background-color:red; -->
+        <iframe src="http://localhost:5003/" id="plan" style="width:100%; height:100%;" frameborder="1" marginwidth="0" marginheight="0" scrolling="auto" allowtransparency="false" alt="affichage p o i">
+        </iframe>
+    </div> <!-- Affichage géographique -->
+
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js"></script>
+    <script> // Clic sur image pour rechargement de la page et remettre les données par défaut
+        function img_title_click() {
+            //     console.log('Image cliquée');
+            //     alert('Image cliquée');
+            // }
+                fetch("http://localhost:2025/clean_html", {
+                                method: 'POST',
+                                headers: {
+                                    "Accept": "application/json",
+                                    'Content-Type': "application/json"
+                                },
+                                body: "Suppression de la route créée...",
+                });
+            }
+    </script>
+    <script> // Envoi des thèmes choisis par l'utilisateur
+        var tagSelector = new MultiSelectTag('themes', {
+            maxSelection: 9,
+            required: true,
+            placeholder: 'Thèmes',
+            onChange: function(selected) {
+                // console.log('Selection changed:', selected);
+                fetch("http://localhost:2025/user_themes", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': "application/json"
+                                },
+                                body: JSON.stringify(selected),
+                });
+            }
+        });
+    </script>
+    <script> // Envoi des adresses de départ ou d'arrivée
+        function address(location) {
+                fetch("http://localhost:2025/send_address", {
+                                method: 'POST',
+                                headers: {
+                                    "Accept": "application/json",
+                                    'Content-Type': "application/json"
+                                },
+                                body: JSON.stringify([{[location]: document.getElementById(location).value}]),
+                });
+            }
+    </script>
+    <script> // Spécifications du bouton PROPOSITION pour afficher un choix de 'poi' autour des zones géographiques spécifiées
+        function btn_propose_click() {
+                // console.log('Selection changed:', clicked_id);
+            //     alert(clicked_id);
+            // }
+                fetch("http://localhost:2025/poi_suggestions", {
+                                method: 'POST',
+                                headers: {
+                                    "Accept": "application/json",
+                                    'Content-Type': "application/json"
+                                },
+                                body: "Affichage des POI trouvés...",
+                });
+            }
+    </script>
+    <script> // Spécifications du bouton VALIDATION pour tracer la route selon les 'poi' validés
+        function btn_validate_click() {
+                // console.log('Selection changed:', clicked_id);
+            //     alert(clicked_id);
+            // }
+                fetch("http://localhost:2025/poi_validation", {
+                                method: 'POST',
+                                headers: {
+                                    "Accept": "application/json",
+                                    'Content-Type': "application/json"
+                                },
+                                body: "Route à tracer...",
+                });
+            }
+    </script>
+    <script> // Récupération du rayon de recherche
+        const slider = document.getElementById("slider_rayon")
+        slider.addEventListener("input", function(){
+            const slider_valeur = document.getElementById("slider_rayon_valeur")
+            slider_valeur.textContent = this.value;
+            fetch("http://localhost:2025/search_field", {
+                                method: 'POST',
+                                headers: {
+                                    "Accept": "application/json",
+                                    'Content-Type': "application/json"
+                                },
+                                body: JSON.stringify([{"radius": slider_valeur.textContent}]),
+                });
+        })
+    </script>
+    <script> // Affichage du temps de trajet entre chaque 'poi' dans une fenêtre ALERT
+        function estimate_travel_time_click() {
+                let text_alert=``
+                alert(text_alert)
+                console.log(text_alert)
+            }
+    </script>
+</body>
+</html>

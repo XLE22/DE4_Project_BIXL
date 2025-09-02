@@ -2,7 +2,7 @@
 # et les neuf classes utilisées pour le projet :
 #   1. Commerce
 #       2. Culture
-#           3. Èvénement
+#           3. Événement
 #               4. Hébergement
 #                   5. Loisirs
 #                       6. Patrimoine
