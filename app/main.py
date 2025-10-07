@@ -1,13 +1,15 @@
-import os, shutil
+import os
 from typing import Dict,Any
 import requests
 import logging
 # import requests
 # from dotenv import load_dotenv
 from fastapi import FastAPI
-from pydantic import BaseModel
+# from pydantic import BaseModel
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_client import make_asgi_app
+
 from app.accueil.final_time_report import change_html_content, change_text_alert
 
 ACCUEIL_FOLDER_PATH = "/app/accueil"
@@ -19,6 +21,7 @@ logger=logging.getLogger('main_logger')
 app = FastAPI()
 app.mount("/src", StaticFiles(directory=ACCUEIL_FOLDER_PATH)) #Indication du chemin CSS dans le HTML
 app.mount("/images", StaticFiles(directory=ACCUEIL_FOLDER_PATH + "/images")) #Indication du chemin des images dans le HTML
+app.mount("/metrics", make_asgi_app())
 
 addr: Dict = {HTML_ADDR_DEP_ID:"",
               HTML_ADDR_ARR_ID:""} #Contient l'adresse de départ et l'adresse d'arrivée indiquées par l'utilisateur

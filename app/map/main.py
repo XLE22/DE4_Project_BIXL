@@ -8,6 +8,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from prometheus_client import make_asgi_app
+
 import pandas as pd
 
 from .route.create import router as map_create_router
@@ -29,6 +31,7 @@ app = FastAPI()
 app.include_router(map_create_router)
 app.include_router(map_create_marker_router)
 app.include_router(map_search_router)
+app.mount("/metrics", make_asgi_app())
 
 # CORS = propriété de fetch() pour le code html
 app.add_middleware(
@@ -108,7 +111,7 @@ def create_first_html():
     res = requests.get(js_file_path,timeout=1800)
     df = pd.DataFrame(res.json())
 
-    for i in range(0, len(df)):
+    for i in range(0, 500):#len(df)):
 
         stars= "⭐️" * df.iloc[i]['etoiles']  # Affichage simplifié en HTML pour les avis
         adr=html_address(df.iloc[i]['adresse'])

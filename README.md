@@ -18,6 +18,6 @@ Pour ce faire, ouvrir un navigateur web et taper 'localhost:5001/poi_file_path' 
 
 2/. S'il n'y a aucune donnée géographique, lancer la collecte via un navigateur web en tapant :
 => 'localhost:5001/' ou '127.0.0.1:5001/'
-Cette requête gère automatiquement le rapatriement et la création du ficheir de données géographiques.
+Cette requête gère automatiquement le rapatriement et la création du fichier de données géographiques.
 
 3/. Dès que les données sont présentes, taper dans un navigateur web 'localhost:2025/' ou '127.0.0.1:2025/' pour afficher l'interface graphique.

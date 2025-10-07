@@ -1,0 +1,18 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'alerts-email-notifications'
+
+receivers:
+- name: 'alerts-email-notifications'
+  email_configs:
+  - to: 'my-email@orange.com'
+    from: 'project_group@orange.com'
+    smarthost: smtp.example.com:587
+    auth_username: 'my-email-username'
+    auth_password: 'my-email-password'
