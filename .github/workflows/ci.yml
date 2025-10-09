@@ -1,0 +1,14 @@
+name: ci_project_bixl
+on:
+    push:
+        branches:
+        - "main"
+jobs:
+    simple_ci:
+        runs-on: ubuntu-latest
+        steps:
+        - name: chargement de branche
+          uses: actions/checkout@v5
+
+        - name: vérification de Docker
+          run: docker compose up -d
