@@ -1,15 +1,12 @@
-import logging
 import os
 import datetime
 import shutil
 import json
 import pandas as pd
-from dotenv import load_dotenv
 from fastapi import APIRouter
-# from app.logs.logs import *
+from app.logs import data_logger
 from .poi_ontology_converter import POC
 
-logger=logging.getLogger("create_logger")
 router = APIRouter(prefix="/data_create")
 
 CONTACT = 'hasContact'
@@ -45,14 +42,14 @@ def remove_duplicates(file_name: str) -> bool:
                    force_ascii=False)
         return True
     except:
-        logger.error()
+        data_logger.error()
         return False
 
 def poi_get_name(db: pd.DataFrame, elt: int) -> str | bool:
     try:
         return db.loc[[elt],[NOM]].values[0][0]
     except:
-        logger.error()
+        data_logger.error()
         return False
     
 def poi_get_themes(j_content: str) -> list[str]:
@@ -157,7 +154,7 @@ def poi_get_infos() -> bool:
     INDEX_PATH = POI_PATH + '/index.json'
     
     if os.path.exists(INDEX_PATH) is False:
-        logger.error("Le fichier index.json n'existe pas", exc_info=True)
+        data_logger.error("Le fichier index.json n'existe pas", exc_info=True)
         return False
 
     try:
@@ -199,25 +196,23 @@ def poi_get_infos() -> bool:
                 return True
             return False
         except:
-            logger.error()
+            data_logger.error()
             return False
     
     except:
-        logger.error()
+        data_logger.error()
         return False
     
 @router.get("/")
 def main_create() -> bool:
-    load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
-    # get_log_from(LogLevels.debug)
 
-    logger.info("Début de la création du fichier JSON")
+    data_logger.info("Début de la création du fichier JSON")
 
     if poi_get_infos():
-        logger.info("Création du JSON datatourisme OK")
+        data_logger.info("Création du JSON datatourisme OK")
         return True
     
-    logger.error("⚠️ Création du JSON datatourisme NOK ⚠️")
+    data_logger.error("⚠️ Création du JSON datatourisme NOK ⚠️")
     return False
 
 if __name__ == "__main__":

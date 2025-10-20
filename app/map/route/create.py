@@ -10,6 +10,7 @@ from geopy.geocoders import ArcGIS
 import openrouteservice
 from openrouteservice import convert
 
+from app.logs import map_logger
 from app.main import HTML_ADDR_DEP_ID, HTML_ADDR_ARR_ID
 from .create_marker import user_points
 
@@ -156,6 +157,8 @@ def time_between(depart: ReportStep, arriv: ReportStep) -> str:
 # Ajout des coordonnées du 'poi' avec son nom.
 @router.post("/poi_add")
 def add_step(coordinates: Coord) -> None:
+    map_logger.info("Ajout POI avec son nom")
+
     global routes, steps
 
     lat_long = [coordinates.lat, coordinates.long]
@@ -183,6 +186,8 @@ def add_step(coordinates: Coord) -> None:
 # Suppression des coordonnées du 'poi' et de son nom.
 @router.post("/poi_remove")
 def remove_step(coordinates: Coord) -> None:
+    map_logger.info("Suppression POI avec son nom")
+
     global routes, steps
 
     lat_long = [coordinates.lat, coordinates.long]
@@ -260,6 +265,8 @@ def check_before_create() -> None:
 # Utilisation de la liste des 'poi' créée et mise à jour de l'interface graphique pour l'estimation du temps de trajet.
 @router.post("/create_route")
 def create_route():# -> bool | FileResponse:
+    map_logger.info("MàJ interface graphique pour l'estimation du temps de trajet")
+
     global routes, steps
     check_before_create()
 
@@ -336,6 +343,8 @@ def get_name_from(rootes:list[ReportStep]) -> list[str]:
 # REMISE À ZÉRO DES ROUTES
 @router.post("/clean_routes")
 def clean_routes() -> None:
+    map_logger.info("Remise à zéro des routes")
+
     global departure, arrival, routes, steps
 
     departure = ("","")
@@ -347,6 +356,8 @@ def clean_routes() -> None:
 # TEMPS DE TRAJET
 # Estimation du temps de trajet entre chaque point géographique défini par l'utilisateur.
 def estimate_travel_time_user(geo_points:list[str], total_time: str ) -> str:
+    map_logger.info("Estimation du temps de trajet entre chaque point géographique défini par l'utilisateur")
+
     global departure, arrival
 
     is_depart: bool= False
@@ -367,7 +378,7 @@ def estimate_travel_time_user(geo_points:list[str], total_time: str ) -> str:
 
     nb_user_points = len(geo_points)
 
-    if (nb_user_points == 0):
+    if nb_user_points == 0:
         if (is_depart is True) and (is_arriv is True):
             return calculate_time(ReportStep(DEPARTURE_REPORT, [departure.coord[1], departure.coord[0]]),
                                   ReportStep(ARRIVAL_REPORT, [arrival.coord[1], arrival.coord[0]]))
@@ -388,34 +399,11 @@ def estimate_travel_time_user(geo_points:list[str], total_time: str ) -> str:
     estimated_time_user = "TOTAL : " + total_time + "  ----->  " + estimated_time_user
     return estimated_time_user
 
-    # global is_departure, is_arrival, routes
-    # estimated_time: str = ""
-
-    # if len(routes) < 2: return estimated_time
-    
-    # if len(routes) == 2:
-    #     return calculate_time(ReportStep(DEPARTURE_REPORT, routes[0]),
-    #                           ReportStep(ARRIVAL_REPORT, routes[1]))
-    # if len(routes) == 3:
-    #     estimated_time += calculate_time(ReportStep(DEPARTURE_REPORT, routes[0]),
-    #                                      ReportStep(STEP_REPORT + str(1), routes[1]))
-    #     estimated_time += calculate_time(ReportStep("", routes[1]),
-    #                                      ReportStep(ARRIVAL_REPORT, routes[2]))
-    # else:
-    #     estimated_time += calculate_time(ReportStep(DEPARTURE_REPORT, routes[0]),
-    #                                      ReportStep("", routes[1]))
-    #     for step in range(1,len(routes)-2):
-    #         estimated_time += calculate_time(ReportStep(STEP_REPORT + str(step), routes[step]),
-    #                                          ReportStep("", routes[step+1]))
-    #     estimated_time += calculate_time(ReportStep(STEP_REPORT + str(step+1), routes[step+1]),
-    #                                      ReportStep(ARRIVAL_REPORT, routes[step+2]))
-
-    # return estimated_time
-
 
 # TEMPS DE TRAJET
 # Estimation du temps de trajet entre chaque 'poi'.
 def estimate_travel_time_poi(rootes: list[ReportStep]) -> str:
+    map_logger.info("Estimation du temps de trajet entre chaque POI")
     rootes_len: int = len(rootes)
     poi_path: str = '''
 '''
@@ -432,8 +420,8 @@ def estimate_travel_time_poi(rootes: list[ReportStep]) -> str:
         return poi_path
 
     for route in rootes[1:rootes_len - 2]:
-            index: int = int(rootes.index(route))
-            poi_path += f"\nDe : {poi_names[index]}\nVers : {poi_names[index + 1]}\nDurée : {time_between(rootes[index], rootes[index + 1])}\n"
+        index: int = int(rootes.index(route))
+        poi_path += f"\nDe : {poi_names[index]}\nVers : {poi_names[index + 1]}\nDurée : {time_between(rootes[index], rootes[index + 1])}\n"
 
     poi_path += f"\nDe : {poi_names[-2]}\nArrivée : {poi_names[-1]}\nDurée : {time_between(rootes[-2], rootes[-1])}\n"
 
@@ -443,6 +431,7 @@ def estimate_travel_time_poi(rootes: list[ReportStep]) -> str:
 # MISE À JOUR DU TEMPS DE TRAJET ENTRE CHAQUE ÉTAPE
 # Calculs des temps de trajet prévus entre chaque étape géographique de l'utilisateur.
 def time_estimation(total_time_travel: str) -> str:
+    map_logger.info("Calculs des temps de trajet prévus entre chaque étape géographique de l'utilisateur")
     global routes, user_points
 
     estimated_time_poi = estimate_travel_time_poi(routes)

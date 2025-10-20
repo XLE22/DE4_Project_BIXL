@@ -12,12 +12,15 @@ from prometheus_client import make_asgi_app
 
 import pandas as pd
 
+from app.logs import map_logger
+
 from .route.create import router as map_create_router
 from .route.create_marker import router as map_create_marker_router
 from .route.search_poi import router as map_search_router
 from .route.create_marker import insert_html_code_for_marker
 from .route.create_circle import create_circle_from, insert_html_code_for_circle
 from .route.search_poi import get_nearest_poi
+
 
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 PARENT_FILE_PATH = os.path.dirname((FILE_PATH))
@@ -91,8 +94,12 @@ def clean_folium_file() -> bool:
     if os.path.exists(FOLIUM_FILE_PATH): # Efface le contenu du fichier
         with open(FOLIUM_FILE_PATH, 'w') as f:
             f.write("")
+
+            map_logger.info("Effacement du fichier FOLIUM")
+
             return True
-        
+    
+    map_logger.error("Problème dans l'effacement du fichier FOLIUM")
     return False
 
 
@@ -187,6 +194,7 @@ def create_first_html():
 
     # Création de cerles autour des lieux géographiques de l'utilisateur.
     if is_poi_suggestion is True:
+        map_logger.info("Suggestion POI demandée par l'utilisateur")
         folium_map_file_path = FOLIUM_POI_SUGGESTION_FILE_PATH
         is_poi_suggestion = False
 
@@ -201,8 +209,6 @@ def create_first_html():
     # Injection de code pour la suppression des cercles autour des propositions de 'poi'.
     insert_html_code_for_circle(folium_map_file_path)
 
-    # # map_html = folium_map.get_root().render()
-    # # return map_html
     return FileResponse(folium_map_file_path,
                         media_type='text/html')
 
@@ -214,11 +220,16 @@ def create_first_html():
 def main() -> str:
     global is_first_launch
 
+    map_logger.info("Début du chargement du fichier FOLIUM")
+
     if is_first_launch or is_poi_suggestion:
         if is_first_launch: clean_folium_file()
         is_first_launch=False
+        map_logger.info("Chargement fichier FOLIUM [premier lancement OU suggestions]")
         return create_first_html()
     
+    map_logger.info("Chargement fichier FOLIUM [HORS premier lancement OU suggestions]")
+
     return FileResponse(FOLIUM_FILE_PATH,
                         media_type='text/html')
 
@@ -227,6 +238,8 @@ def main() -> str:
 # Efface la partie de code concernant la création de routes.
 @app.post("/clean_route")
 def clean_route():
+
+    map_logger.info("Début de la suppression des routes dans le fichier HTML")
 
     with open(FOLIUM_FILE_PATH, 'r') as mapfile:
         html_file = mapfile.read()
@@ -243,6 +256,8 @@ def clean_route():
 </html>'''
         )
 
+    map_logger.info("uppression des routes dans le fichier HTML effective")
+
 
 # VIDAGE DU FICHIER HTML DES SUGGESTIONS POI
 # Efface tout le code présent dans ce fichier.
@@ -250,11 +265,15 @@ def clean_route():
 def clean_html_poi_suggestions() -> bool:
     global FOLIUM_POI_SUGGESTION_FILE_PATH
 
+    map_logger.info("Début d'effacement du fichier HTML des suggestions POI")
+
     if os.path.exists(FOLIUM_POI_SUGGESTION_FILE_PATH): # Efface le contenu du fichier
         with open(FOLIUM_POI_SUGGESTION_FILE_PATH, 'w') as f:
             f.write("")
+            map_logger.info("Effacement du code OK dans le fichier HTML")
             return True
         
+    map_logger.error("Problème dans l'effacement du code dans le fichier HTML des suggestions POI")
     return False
 
 
@@ -262,6 +281,8 @@ def clean_html_poi_suggestions() -> bool:
 # pour adapter le fichier HTML à charger dans 'main()' et 'create_first_html()'.
 @app.put("/tweak_poi_suggestion")
 def tweak_poi_suggestion() -> bool:
+    map_logger.info("Information reçue pour adaptation du fichier HTML à charger (bouton PROPOSITION)")
+    
     global is_poi_suggestion
 
     is_poi_suggestion = True
@@ -272,6 +293,8 @@ def tweak_poi_suggestion() -> bool:
 # Indication de premier lancement d'application.
 @app.put("/tweak_first_launch")
 def tweak_first_launch() -> bool:
+    map_logger.info("Prochain lancement perçu comme le premier (initialisation 'clic' bannière)")
+
     global is_first_launch
 
     is_first_launch = True
@@ -279,6 +302,5 @@ def tweak_first_launch() -> bool:
 
 
 if __name__ == "__main__":
-    # load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
     # main()
     test="hello"

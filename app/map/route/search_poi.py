@@ -7,6 +7,7 @@ import pandas as pd
 import geopandas as gpd
 from geopandas import GeoDataFrame
 
+from app.logs import map_logger
 from .create_marker import user_points
 
 
@@ -24,6 +25,8 @@ json_file_path = ""
 
 # Existence du fichier 'json'.
 def get_json_file() -> bool:
+    map_logger.debug("Existence du fichier JSON")
+
     res_name = requests.get("http://data:5000/poi_file_path", timeout=1800)
     res_str = str(res_name.json())
     
@@ -34,6 +37,8 @@ def get_json_file() -> bool:
 
 # Création de la GeoDataFrame pour trouver les 'poi'.
 def create_geodf_for(user_point_coord: list[str]) -> GeoDataFrame:
+    map_logger.debug("Création de la GeoDataFrame pour trouver les POI")
+
     USER_POINT_LAT_CENTER = 'lat_center'
     USER_POINT_LONG_CENTER = 'long_center'
 
@@ -82,6 +87,7 @@ def poi_inside_circle(gdf: GeoDataFrame) -> GeoDataFrame:
 
 # Liste des cinq 'poi' les plus proches du point géographique utilisateur.
 def filtered_poi_with_user_themes(gdf: GeoDataFrame) -> list[str]:
+    map_logger.debug("Liste des cinq POI les plus proches du point géographique utilisateur")
 
     themes_filter = requests.get('http://server:5000/get_user_themes',
                                  timeout=1800)
@@ -95,6 +101,8 @@ def filtered_poi_with_user_themes(gdf: GeoDataFrame) -> list[str]:
 # Recherche des cinq 'poi' les plus proches du point géographique souhaité par l'utilisateur.
 @router.get("/get_nearest_poi")
 def get_nearest_poi():
+    map_logger.info("Recherche des cinq POI les plus proches du point géographique souhaité par l'utilisateur")
+
     global user_points
     
     if len(user_points) == 0: return []

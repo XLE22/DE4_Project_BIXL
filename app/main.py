@@ -2,21 +2,20 @@ import os
 from typing import Dict,Any
 import requests
 import logging
-# import requests
-# from dotenv import load_dotenv
+
 from fastapi import FastAPI
-# from pydantic import BaseModel
+
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import make_asgi_app
 
 from app.accueil.final_time_report import change_html_content, change_text_alert
+from app.logs import app_logger
+
 
 ACCUEIL_FOLDER_PATH = "/app/accueil"
 HTML_ADDR_DEP_ID = "departure" #ID de l'objet contenant l'adresse de départ défini dans le fichier HTML
 HTML_ADDR_ARR_ID = "arrival" #ID de l'objet contenant l'adresse d'arrivée défini dans le fichier HTML
-
-logger=logging.getLogger('main_logger')
 
 app = FastAPI()
 app.mount("/src", StaticFiles(directory=ACCUEIL_FOLDER_PATH)) #Indication du chemin CSS dans le HTML
@@ -43,6 +42,8 @@ time_estimation: str = "" #Affichage du temps prévu entre chaque étape pour le
 # Il suffit de donner la chaîne à afficher en entrée et de recharger le fichier 'html'.
 @app.post("/update_time_estimation/")
 def update_time_estimation(text_content: Dict) -> None:
+    app_logger.debug("Mise à jour du temps entre chaque étape")
+
     FILE_PATH = os.path.dirname(os.path.abspath(__file__))
     HTML_FILE_PATH = FILE_PATH + '/accueil/accueil.html'
 
@@ -57,6 +58,8 @@ def update_time_estimation(text_content: Dict) -> None:
 # CHARGEMENT DE LA PAGE D'ACCUEIL
 @app.get("/")
 def display_accueil() -> FileResponse:
+    app_logger.debug("Chargement de la page d'accueil")
+
     FILE_PATH = os.path.dirname(os.path.abspath(__file__))
     HTML_FILE_PATH = FILE_PATH + '/accueil/accueil.html'
     return FileResponse(HTML_FILE_PATH)
@@ -65,6 +68,7 @@ def display_accueil() -> FileResponse:
 # RÉCUPÉRATION DES ADRESSES ISSUES DE L'INTERFACE GRAPHIQUE
 @app.post("/send_address")
 def send_address(addr_from_user: list[Any] = None) -> None:
+    app_logger.debug("Récupération des adresses issues de l'interface graphique")
 
     if HTML_ADDR_DEP_ID in addr_from_user[0]:
         addr[HTML_ADDR_DEP_ID] = ""
@@ -80,6 +84,8 @@ def send_address(addr_from_user: list[Any] = None) -> None:
 # MISE À DISPOSITION DES ADRESSES RÉCUPÉRÉES DE L'INTERFACE GRAPHIQUE
 @app.get("/get_address")
 def get_address() -> Dict:
+    app_logger.debug("Mise à disposition des adresses issues de l'interface graphique")
+
     global addr
     return addr
 
@@ -87,6 +93,8 @@ def get_address() -> Dict:
 # RÉCUPÉRATION DES THÈMES
 @app.post("/user_themes")
 def user_themes(themes: list[Any] = None):
+    app_logger.debug("Récupération des thèmes issus de l'interface graphique")
+
     global themes_filter
     
     themes_filter = []
@@ -98,6 +106,8 @@ def user_themes(themes: list[Any] = None):
 # MISE À DISPOSITION DES THÈMES
 @app.get("/get_user_themes")
 def get_user_themes() -> list[str]:
+    app_logger.debug("Mise à disposition des thèmes issus de l'interface graphique")
+
     global themes_filter
     
     return themes_filter
@@ -106,6 +116,8 @@ def get_user_themes() -> list[str]:
 # RÉCUPÉRATION DU RAYON DE RECHERCHE
 @app.post("/search_field")
 def search_field(radius: list[Any] = None) -> None:
+    app_logger.debug("Récupération du rayon de recherche issu de l'interface graphique")
+
     global search_radius
     if "radius" in radius[0]: search_radius = int(radius[0]["radius"])*1000
 
@@ -113,6 +125,8 @@ def search_field(radius: list[Any] = None) -> None:
 # MISE À DISPOSITION DU RAYON DE RECHERCHE
 @app.get("/get_search_field")
 def get_search_field() -> int:
+    app_logger.debug("Mise à disposition du rayon de recherche issu de l'interface graphique")
+
     global search_radius
     
     return search_radius
@@ -122,6 +136,8 @@ def get_search_field() -> int:
 # Spécifications dans les scripts du fichier 'accueil.html'.
 @app.post("/poi_suggestions")
 def poi_suggestions():# -> bool:
+    app_logger.debug("Activation du bouton PROPOSITION")
+
     requests.put('http://map:5000/tweak_poi_suggestion', timeout=1800)
     pois = requests.get('http://map:5000/map_search/get_nearest_poi', timeout=1800)
     return pois.json()
@@ -131,14 +147,15 @@ def poi_suggestions():# -> bool:
 # Spécifications dans les scripts du fichier 'accueil.html'.
 @app.post("/poi_validation")
 def poi_validation() -> None:
-    # als = 
+    app_logger.debug("Activation du bouton VALIDATION")
+
     requests.post('http://map:5000/map_create/create_route', timeout=1800)
-    # return als.json()
 
 
 # # REMISE PAR DÉFAUT DES VALEURS... UN PEU PARTOUT
 @app.post("/clean_html")
 def clean_html() -> None:
+    app_logger.info("Initialisation des listes et valeurs pour une nouvelle demande")
     global addr, themes_filter, search_radius, time_estimation
 
     requests.post('http://map:5000/map_create/clean_routes',
@@ -176,6 +193,4 @@ def clean_html() -> None:
     #is_departure is_arrival et les departure et arrival à remettre à zéro dans create.py.
 
 if __name__ == "__main__":
-    # load_dotenv() #Charge les variables d'environnement présentes dans '.env'.
-    # get_log_from(LogLevels.debug)
     hel="hello"

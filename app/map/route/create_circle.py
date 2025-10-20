@@ -1,7 +1,12 @@
 import folium
 
+from app.logs import map_logger
+
+
 # Création des cercles autour des 'pois' proposés.
 def create_circle_from(geo_sites: list[str], folium_map: folium.Map) -> None:
+    map_logger.info("Création des cercles autour des POIs proposés")
+    
     for geo_site in geo_sites:
         for poi in geo_site:
 
@@ -20,6 +25,8 @@ def create_circle_from(geo_sites: list[str], folium_map: folium.Map) -> None:
 # Code à insérer pour supprimer un cercle par simple clic en évitant
 # une collision de clic avec celui qui gère la création d'un marker.
 def html_code() -> str:
+    map_logger.info("Insertion code HTML pour suppression de cercle POI")
+
     return '''<script>
     document.querySelectorAll("path.leaflet-interactive").forEach(i => i.addEventListener(
     "click", function(e){

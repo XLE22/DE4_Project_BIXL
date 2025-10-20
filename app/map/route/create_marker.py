@@ -3,6 +3,8 @@ import folium
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from app.logs import map_logger
+
 class Coord(BaseModel):
     lat: float
     long: float
@@ -101,6 +103,8 @@ def html_code(latlong_name: str, map_name: str) -> str:
 def insert_html_code_for_marker(html_file_path: str) -> None:
     html_folium = None
 
+    map_logger.info("Insertion du code HTML pour création de 'markers'")
+
     with open(html_file_path, 'r') as mapfile:
         html_folium = mapfile.read()
 
@@ -120,6 +124,8 @@ def insert_html_code_for_marker(html_file_path: str) -> None:
 # AJOUT POI GÉOGRAPHIQUE DE L'UTILISATEUR
 @router.post("/add_user_point")
 def add_user_point(coordinates:Coord) -> None:
+    map_logger.info("Ajout POI géographique")
+
     global user_points
     user_points.append([coordinates.lat,coordinates.long])
 
@@ -127,6 +133,8 @@ def add_user_point(coordinates:Coord) -> None:
 # SUPPRESSION POI GÉOGRAPHIQUE DE L'UTILISATEUR
 @router.post("/remove_user_point")
 def remove_user_point(coordinates:Coord) -> None:
+    map_logger.info("Suppression POI géographique")
+
     global user_points
     elt = [coordinates.lat,coordinates.long]
     if elt in user_points: user_points.remove(elt)
@@ -135,12 +143,15 @@ def remove_user_point(coordinates:Coord) -> None:
 # ENVOI LISTE DES MARKERS CRÉÉS
 @router.get("/get_user_points")
 def get_user_points() -> list[Coord]:
+    map_logger.info("Envoi liste des points géographiques créés")
+
     return user_points
 
 
 # REMISE PAR DÉFAUT DES POINTS GÉOGRAPHIQUES DE L'UTILISATEUR
 @router.post("/clean_user_points")
 def clean_user_points() -> None:
+    map_logger.info("Initialisation dela liste des POI géographiques")
     global user_points
     
     user_points.clear()
