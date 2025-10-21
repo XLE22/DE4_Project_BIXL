@@ -190,7 +190,5 @@ def clean_html() -> None:
     requests.put('http://map:5000/tweak_first_launch',
                   timeout=1800) #Paramètre 'is_first_launch' mis à True
 
-    #is_departure is_arrival et les departure et arrival à remettre à zéro dans create.py.
-
 if __name__ == "__main__":
     hel="hello"

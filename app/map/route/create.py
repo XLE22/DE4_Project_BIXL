@@ -345,8 +345,10 @@ def get_name_from(rootes:list[ReportStep]) -> list[str]:
 def clean_routes() -> None:
     map_logger.info("Remise à zéro des routes")
 
-    global departure, arrival, routes, steps
+    global is_departure, is_arrival,departure, arrival, routes, steps
 
+    is_departure = False
+    is_arrival = False
     departure = ("","")
     arrival = ("","")
     routes.clear()
