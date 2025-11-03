@@ -22,16 +22,16 @@ services:
       - data-vol:/app/data/datatourisme_poi
     command: uvicorn app.data.main:app --host 0.0.0.0 --port 5000 --reload
   database:
-    image: app/database:1.0.0
-    container_name: database
-    build:
-      context: .
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: voyage
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: db_bon_voyage
+    volumes:
+      - database-vol:/var/lib/postgresql/data
     ports:
       - "5002:5000"
-    restart: unless-stopped
-    networks:
-      - containers-net
-    command: uvicorn app.database.main:app --host 0.0.0.0 --port 5000 --reload
   map:
     image: app/map:1.0.0
     container_name: map
@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  data-vol:
+  database-vol:
     driver: local
   prometheus-vol:
     driver: local
