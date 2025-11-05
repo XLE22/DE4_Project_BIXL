@@ -97,7 +97,7 @@ services:
     networks:
       - containers-net
     restart: unless-stopped
-#Volumes----------->
+#Volumes----------------->
 volumes:
   data-vol:
     driver: local
