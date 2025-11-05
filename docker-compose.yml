@@ -97,14 +97,15 @@ services:
     networks:
       - containers-net
     restart: unless-stopped
-
+#Volumes----------->
 volumes:
+  data-vol:
+    driver: local
   database-vol:
     driver: local
   prometheus-vol:
     driver: local
   grafana-vol:
     driver: local
-
 networks:
   containers-net:
