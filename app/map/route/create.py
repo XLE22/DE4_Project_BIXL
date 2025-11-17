@@ -106,7 +106,7 @@ def calculate_time(depart: ReportStep, arriv: ReportStep) -> str:
     SUMMARY = 'summary'
     DURATION = 'duration'
 
-    ORS_KEY = '5b3ce3597851110001cf62488dbf498826f54bbb859dd1aa67054989'
+    ORS_KEY = '' # Clé openrouteservice
     client = openrouteservice.Client(key=ORS_KEY) 
 
     route=client.directions(coordinates=[depart.coord, arriv.coord],
@@ -136,7 +136,7 @@ def time_between(depart: ReportStep, arriv: ReportStep) -> str:
     SUMMARY = 'summary'
     DURATION = 'duration'
 
-    ORS_KEY = '5b3ce3597851110001cf62488dbf498826f54bbb859dd1aa67054989'
+    ORS_KEY = '' # Clé openrouteservice
     client = openrouteservice.Client(key=ORS_KEY) 
 
     route=client.directions(coordinates=[depart.coord, arriv.coord],
@@ -275,7 +275,7 @@ def create_route():# -> bool | FileResponse:
     rootes = remove_name_from(routes) #Suppression du nom pour ne laisser que les coordonnées pour 'openrouteservice'.
 
     #Tracé du trajet le plus court qui passe pas tous les 'poi'.
-    ORS_KEY = '5b3ce3597851110001cf62488dbf498826f54bbb859dd1aa67054989'
+    ORS_KEY = '' # Clé openrouteservice
     client = openrouteservice.Client(key=ORS_KEY)
     route = client.directions(coordinates=rootes, profile='driving-car')
     decode = convert.decode_polyline(route['routes'][0]['geometry'])

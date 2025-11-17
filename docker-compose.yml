@@ -21,17 +21,17 @@ services:
     volumes:
       - data-vol:/app/data/datatourisme_poi
     command: uvicorn app.data.main:app --host 0.0.0.0 --port 5000 --reload
-  database:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: voyage
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: db_bon_voyage
-    volumes:
-      - database-vol:/var/lib/postgresql/data
-    ports:
-      - "5002:5000"
+  # database:
+  #   image: postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: voyage
+  #     POSTGRES_PASSWORD: secret
+  #     POSTGRES_DB: db_bon_voyage
+  #   volumes:
+  #     - database-vol:/var/lib/postgresql/data
+  #   ports:
+  #     - "5002:5000"
   map:
     image: app/map:1.0.0
     container_name: map
@@ -68,7 +68,6 @@ services:
     networks:
       - containers-net
     restart: unless-stopped
-
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -83,7 +82,6 @@ services:
     networks:
       - containers-net
     restart: unless-stopped
-
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
@@ -97,12 +95,12 @@ services:
     networks:
       - containers-net
     restart: unless-stopped
-#Volumes----------------->
+
 volumes:
   data-vol:
     driver: local
-  database-vol:
-    driver: local
+  # database-vol:
+  #   driver: local
   prometheus-vol:
     driver: local
   grafana-vol:

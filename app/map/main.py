@@ -118,7 +118,7 @@ def create_first_html():
     res = requests.get(js_file_path,timeout=1800)
     df = pd.DataFrame(res.json())
 
-    for i in range(0, 500):#len(df)):
+    for i in len(df):
 
         stars= "⭐️" * df.iloc[i]['etoiles']  # Affichage simplifié en HTML pour les avis
         adr=html_address(df.iloc[i]['adresse'])

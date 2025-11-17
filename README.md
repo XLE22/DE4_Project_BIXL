@@ -8,6 +8,8 @@ La clé d'accès à OPENROUTESERVICE est peut-être aussi obsolète. 😓
 Il faut alors se créer un compte (https://openrouteservice.org) pour obtenir cette clé à rentrer dans le code où
 ORS_KEY est indiqué.
 
+L'affichage des POI sur le plan de l'interface graphique peut prendre environ 30 secondes en fonction du nombre d'éléments présents.
+
 
 📚  MODE OPÉRATOIRE  📚
 Se mettre dans le répertoire où se trouve le fichier '.yml' et lancer :

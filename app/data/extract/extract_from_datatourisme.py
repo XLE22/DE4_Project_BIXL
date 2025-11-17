@@ -51,7 +51,7 @@ def main_extract() -> bool:
     
     raw_data: requests.models.Response
     zipped_data: zipfile.ZipFile
-    URL_EXTRACTION = 'https://diffuseur.datatourisme.fr/webservice/c319be5023193089b03be95f079bbfce/{c48f545b-25fe-48b3-84c7-d29f76d9e2e3}' #Bretagne
+    URL_EXTRACTION = '' #URL en https de DATAtourisme pour la Bretagne
     if (raw_data := get_raw_data(URL_EXTRACTION)) is not False:
         data_logger.info("URL connue et validée")
         if (zipped_data := zip_data(raw_data)) is not False:
